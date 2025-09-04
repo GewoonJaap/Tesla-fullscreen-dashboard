@@ -11,10 +11,9 @@ interface SiteCardProps {
   isEditMode?: boolean;
   index?: number;
   isBeingDragged?: boolean;
+  isDropTarget?: boolean;
   onDragStart?: (index: number) => void;
-  onDragEnter?: (index: number) => void;
-  onDragEnd?: () => void;
-  onTouchStart?: (index: number) => void;
+  onDragOver?: (index: number) => void;
 }
 
 const SiteCard: React.FC<SiteCardProps> = ({ 
@@ -25,11 +24,10 @@ const SiteCard: React.FC<SiteCardProps> = ({
   onHide, 
   isEditMode = false,
   index,
-  isBeingDragged,
+  isBeingDragged = false,
+  isDropTarget = false,
   onDragStart,
-  onDragEnter,
-  onDragEnd,
-  onTouchStart,
+  onDragOver,
 }) => {
   const style: React.CSSProperties = {};
   if (site.customColor) {
@@ -39,24 +37,47 @@ const SiteCard: React.FC<SiteCardProps> = ({
   }
   
   const isDraggable = isEditMode && onDelete && typeof index === 'number';
+  
+  if (isDraggable && isDropTarget && !isBeingDragged) {
+    return (
+      <div 
+        className="w-full h-28 rounded-2xl bg-indigo-500/10 border-2 border-dashed border-indigo-500"
+        data-site-index={index}
+      />
+    );
+  }
 
-  const classNames = `w-full flex items-center justify-center p-6 rounded-2xl h-28 font-bold text-lg md:text-xl text-center transition-all transform duration-300 ease-in-out shadow-lg hover:shadow-2xl ${site.color || ''} ${site.textColor} ${!isEditMode ? 'group-hover:scale-105' : ''} disabled:opacity-70`;
+  const wrapperClassNames = `
+    relative group transition-transform duration-300 ease-in-out
+    ${isDraggable ? (isBeingDragged ? 'cursor-grabbing' : 'cursor-grab') : ''}
+    ${isBeingDragged ? 'transform scale-105 rotate-2 shadow-2xl z-20' : ''}
+  `;
+
+  const buttonClassNames = `
+    w-full flex items-center justify-center p-6 rounded-2xl h-28 
+    font-bold text-lg md:text-xl text-center shadow-lg hover:shadow-2xl 
+    transition-all transform duration-300 ease-in-out
+    ${site.color || ''} 
+    ${site.textColor} 
+    ${!isEditMode ? 'group-hover:scale-105' : ''} 
+    ${isBeingDragged ? 'opacity-50' : ''}
+    disabled:opacity-70
+  `;
   
   return (
     <div 
-      className={`relative group transition-opacity ${isBeingDragged ? 'opacity-30' : 'opacity-100'} ${isDraggable ? 'cursor-grab' : ''}`}
+      className={wrapperClassNames}
       draggable={isDraggable}
       onDragStart={isDraggable && onDragStart ? () => onDragStart(index!) : undefined}
-      onDragEnter={isDraggable && onDragEnter ? () => onDragEnter(index!) : undefined}
-      onDragEnd={isDraggable && onDragEnd ? onDragEnd : undefined}
+      onDragEnter={isDraggable && onDragOver ? () => onDragOver(index!) : undefined}
       onDragOver={isDraggable ? (e) => e.preventDefault() : undefined}
-      onTouchStart={isDraggable && onTouchStart ? () => onTouchStart(index!) : undefined}
+      onTouchStart={isDraggable && onDragStart ? () => onDragStart(index!) : undefined}
       data-site-index={index}
     >
       <button
         onClick={() => onLaunch(site.url)}
         style={style}
-        className={classNames}
+        className={buttonClassNames}
         disabled={isEditMode}
       >
         {site.name}

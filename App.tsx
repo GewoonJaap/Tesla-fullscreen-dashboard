@@ -20,6 +20,7 @@ const App: React.FC = () => {
   const [hiddenPopularSites, setHiddenPopularSites] = useState<string[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
 
 
   useEffect(() => {
@@ -67,13 +68,13 @@ const App: React.FC = () => {
   
   useEffect(() => {
     const isDragging = draggedItemIndex !== null;
-    const style = isDragging ? 'none' : '';
-    
-    document.body.style.userSelect = style;
-    document.body.style.webkitUserSelect = style;
-    document.body.style.touchAction = style;
+    document.body.style.cursor = isDragging ? 'grabbing' : '';
+    document.body.style.userSelect = isDragging ? 'none' : '';
+    document.body.style.webkitUserSelect = isDragging ? 'none' : '';
+    document.body.style.touchAction = isDragging ? 'none' : '';
 
     return () => {
+      document.body.style.cursor = '';
       document.body.style.userSelect = '';
       document.body.style.webkitUserSelect = '';
       document.body.style.touchAction = '';
@@ -212,29 +213,43 @@ const App: React.FC = () => {
   }));
 
   const handleDragStart = (index: number) => {
+    if (!isEditMode) return;
     setDraggedItemIndex(index);
   };
-
-  const handleDragEnter = (index: number) => {
+  
+  const handleDragOver = (index: number) => {
     if (draggedItemIndex === null || draggedItemIndex === index) return;
+    setDragOverIndex(index);
+  };
+  
+  const handleGridDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    if (!isEditMode || draggedItemIndex === null) return;
+
+    const target = e.target as HTMLElement;
+    const cardElement = target.closest('[data-site-index]');
+    if (!cardElement) {
+      setDragOverIndex(null);
+    }
+  };
+
+  const handleDrop = () => {
+    if (draggedItemIndex === null || dragOverIndex === null || draggedItemIndex === dragOverIndex) {
+        handleDragEnd();
+        return;
+    }
 
     const newSites = [...customSites];
-    const draggedItem = newSites[draggedItemIndex];
-
-    newSites.splice(draggedItemIndex, 1);
-    newSites.splice(index, 0, draggedItem);
-
-    setDraggedItemIndex(index);
+    const [draggedItem] = newSites.splice(draggedItemIndex, 1);
+    newSites.splice(dragOverIndex, 0, draggedItem);
+    
     setCustomSites(newSites);
+    handleDragEnd();
   };
 
   const handleDragEnd = () => {
     setDraggedItemIndex(null);
-  };
-
-  const handleTouchStart = (index: number) => {
-    if (!isEditMode) return;
-    setDraggedItemIndex(index);
+    setDragOverIndex(null);
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
@@ -243,19 +258,23 @@ const App: React.FC = () => {
     const touch = e.touches[0];
     const targetElement = document.elementFromPoint(touch.clientX, touch.clientY);
 
-    if (!targetElement) return;
+    if (!targetElement) {
+        setDragOverIndex(null);
+        return;
+    };
 
     const cardElement = targetElement.closest<HTMLElement>('[data-site-index]');
     if (cardElement && cardElement.dataset.siteIndex) {
       const targetIndex = parseInt(cardElement.dataset.siteIndex, 10);
       if (!isNaN(targetIndex)) {
-        handleDragEnter(targetIndex);
+        handleDragOver(targetIndex);
+      }
+    } else {
+      const gridElement = targetElement.closest('.sites-grid');
+      if (gridElement) {
+          setDragOverIndex(null);
       }
     }
-  };
-  
-  const handleTouchEnd = () => {
-    handleDragEnd();
   };
 
   return (
@@ -302,10 +321,13 @@ const App: React.FC = () => {
               My Sites
             </h2>
             <div 
-              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6"
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 sites-grid"
+              onDrop={handleDrop}
+              onDragOver={handleGridDragOver}
+              onDragLeave={() => setDragOverIndex(null)}
               onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-              onTouchCancel={handleTouchEnd}
+              onTouchEnd={handleDrop}
+              onTouchCancel={handleDragEnd}
             >
               {customSites.map((site, index) => (
                 <SiteCard
@@ -313,14 +335,13 @@ const App: React.FC = () => {
                   site={site}
                   index={index}
                   isBeingDragged={draggedItemIndex === index}
+                  isDropTarget={dragOverIndex === index}
                   onLaunch={launchUrl}
                   onDelete={handleDeleteRequest}
                   onEdit={handleEdit}
                   isEditMode={isEditMode}
                   onDragStart={handleDragStart}
-                  onDragEnter={handleDragEnter}
-                  onDragEnd={handleDragEnd}
-                  onTouchStart={handleTouchStart}
+                  onDragOver={handleDragOver}
                 />
               ))}
             </div>
