@@ -41,7 +41,7 @@ const SiteCard: React.FC<SiteCardProps> = ({
   if (isDraggable && isDropTarget && !isBeingDragged) {
     return (
       <div 
-        className="w-full h-28 rounded-2xl bg-indigo-500/10 border-2 border-dashed border-indigo-500"
+        className="w-full h-28 rounded-2xl bg-indigo-200 dark:bg-indigo-500/10 border-2 border-dashed border-indigo-400 dark:border-indigo-500"
         data-site-index={index}
       />
     );
@@ -91,7 +91,7 @@ const SiteCard: React.FC<SiteCardProps> = ({
           {onEdit && (
             <button
               onClick={() => onEdit(site)}
-              className="bg-slate-700 hover:bg-blue-500 text-white rounded-full p-1.5 transition-colors"
+              className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-white hover:text-blue-500 dark:hover:bg-slate-600 rounded-full p-1.5 transition-colors"
               aria-label={`Edit ${site.name}`}
             >
               <Pencil size={14} />
@@ -100,7 +100,7 @@ const SiteCard: React.FC<SiteCardProps> = ({
           {onHide && (
              <button
               onClick={() => onHide(site)}
-              className="bg-slate-700 hover:bg-yellow-500 text-white rounded-full p-1.5 transition-colors"
+              className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-white hover:text-yellow-500 dark:hover:bg-slate-600 rounded-full p-1.5 transition-colors"
               aria-label={`Hide ${site.name}`}
             >
               <EyeOff size={14} />
@@ -109,7 +109,7 @@ const SiteCard: React.FC<SiteCardProps> = ({
           {onDelete && (
             <button
               onClick={() => onDelete(site)}
-              className="bg-slate-700 hover:bg-red-500 text-white rounded-full p-1.5 transition-colors"
+              className="bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 text-slate-600 dark:text-white hover:text-red-500 dark:hover:bg-slate-600 rounded-full p-1.5 transition-colors"
               aria-label={`Delete ${site.name}`}
             >
               <X size={14} />

@@ -12,6 +12,8 @@ import { generateNameFromUrl } from './utils/url';
 import { Eye } from 'lucide-react';
 import EditModeToggle from './components/EditModeToggle';
 
+type Theme = 'light' | 'dark';
+
 const App: React.FC = () => {
   const [customSites, setCustomSites] = useState<Site[]>([]);
   const [editingSite, setEditingSite] = useState<Site | null>(null);
@@ -21,7 +23,25 @@ const App: React.FC = () => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const [theme, setTheme] = useState<Theme>(() => {
+    if (typeof localStorage !== 'undefined' && localStorage.getItem('theme')) {
+      return localStorage.getItem('theme') as Theme;
+    }
+    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      return 'dark';
+    }
+    return 'light';
+  });
 
+  useEffect(() => {
+    const root = window.document.documentElement;
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+    localStorage.setItem('theme', theme);
+  }, [theme]);
 
   useEffect(() => {
     try {
@@ -276,11 +296,24 @@ const App: React.FC = () => {
       }
     }
   };
+  
+  const toggleTheme = () => {
+    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
+  };
 
   return (
-    <div className="bg-slate-900 min-h-screen text-white font-sans">
+    <div className="bg-slate-100 dark:bg-slate-900 min-h-screen text-slate-800 dark:text-white font-sans transition-colors duration-300">
+      <Header theme={theme} onToggleTheme={toggleTheme} />
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-16">
-        <Header />
+        <div className="text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">
+            Tesla Fullscreen Portal
+          </h1>
+          <p className="mt-4 text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
+            Launch any website in your Tesla's browser in fullscreen mode.
+          </p>
+        </div>
+
         <UrlInputForm onLaunch={launchUrl} onSave={saveSite} />
         
         <div className="mt-12 sm:mt-16 flex justify-end">
@@ -289,11 +322,11 @@ const App: React.FC = () => {
         
         <div className="mt-6">
           <div className="flex justify-between items-center mb-6 sm:mb-8 flex-wrap gap-2">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-300 text-center sm:text-left">Popular Sites</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-600 dark:text-slate-300 text-center sm:text-left">Popular Sites</h2>
             {hiddenPopularSites.length > 0 && (
               <button
                 onClick={handleRestoreSites}
-                className="flex items-center text-sm text-indigo-400 hover:text-indigo-300 font-semibold transition-colors"
+                className="flex items-center text-sm text-indigo-500 dark:text-indigo-400 hover:text-indigo-600 dark:hover:text-indigo-300 font-semibold transition-colors"
                 aria-label={`Restore ${hiddenPopularSites.length} hidden popular sites`}
               >
                 <Eye size={16} className="mr-1.5" />
@@ -317,7 +350,7 @@ const App: React.FC = () => {
 
         {customSites.length > 0 && (
           <div className="mt-12 sm:mt-16">
-            <h2 className="text-2xl sm:text-3xl font-bold text-slate-300 mb-6 sm:mb-8 text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-bold text-slate-600 dark:text-slate-300 mb-6 sm:mb-8 text-center sm:text-left">
               My Sites
             </h2>
             <div 

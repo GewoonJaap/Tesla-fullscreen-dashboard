@@ -10,7 +10,7 @@ const EditModeToggle: React.FC<EditModeToggleProps> = ({ isEditing, onToggle }) 
   return (
     <button
       onClick={onToggle}
-      className="flex items-center justify-center px-4 py-2 rounded-lg text-white font-semibold text-sm bg-indigo-500/40 border border-indigo-500/60 hover:bg-indigo-500/60 transition-all duration-200"
+      className="flex items-center justify-center px-4 py-2 rounded-lg font-semibold text-sm bg-indigo-100 hover:bg-indigo-200 text-indigo-700 border border-indigo-200 dark:bg-indigo-500/40 dark:text-white dark:border-indigo-500/60 dark:hover:bg-indigo-500/60 transition-all duration-200"
       aria-live="polite"
       aria-label={isEditing ? 'Finish managing sites' : 'Manage sites'}
     >

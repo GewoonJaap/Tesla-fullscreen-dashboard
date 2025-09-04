@@ -19,7 +19,7 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({ selectedColor, onChange }) =>
         type="button"
         onClick={() => onChange(undefined)}
         className={`w-9 h-9 rounded-full flex items-center justify-center transition-transform transform hover:scale-110 ${
-          !selectedColor ? 'ring-2 ring-offset-2 ring-offset-slate-800 ring-indigo-400' : 'ring-1 ring-slate-600'
+          !selectedColor ? 'ring-2 ring-offset-2 ring-offset-slate-100 dark:ring-offset-slate-800 ring-indigo-400' : 'ring-1 ring-slate-400 dark:ring-slate-600'
         }`}
         aria-label="Automatic Color"
         style={{ background: 'conic-gradient(from 180deg at 50% 50%, #ef4444 0deg, #eab308 60deg, #3b82f6 120deg, #8b5cf6 180deg, #ec4899 240deg, #14b8a6 300deg, #ef4444 360deg)'}}
@@ -32,7 +32,7 @@ const ColorSwatch: React.FC<ColorSwatchProps> = ({ selectedColor, onChange }) =>
           type="button"
           onClick={() => onChange(color)}
           className={`w-9 h-9 rounded-full transition-transform transform hover:scale-110 ${
-            selectedColor === color ? 'ring-2 ring-offset-2 ring-offset-slate-800 ring-white' : ''
+            selectedColor === color ? 'ring-2 ring-offset-2 ring-offset-slate-100 dark:ring-offset-slate-800 ring-white' : ''
           }`}
           style={{ backgroundColor: color }}
           aria-label={`Select color ${color}`}
