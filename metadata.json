@@ -1,0 +1,5 @@
+{
+  "name": "Tesla Fullscreen Portal",
+  "description": "Access any website in fullscreen on your Tesla's browser using the YouTube redirect method. Enter a URL or choose from popular sites to launch them in fullscreen.",
+  "requestFramePermissions": []
+}
